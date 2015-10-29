@@ -1,0 +1,3 @@
+[submodule "PSWinCom-sms-class"]
+	path = PSWinCom-sms-class
+	url = git@github.com:datagutten/PSWinCom-sms-class.git
