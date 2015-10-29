@@ -1,0 +1,23 @@
+body {
+	background-color: #3A3A3A;
+	margin: 12px;
+	color: #FFFFFF;
+}
+input
+{
+	height:48px;
+}
+textarea
+{
+	/*height: 100px;*/
+	box-sizing: border-box;
+}
+input, textarea, select
+{
+	color: #FFFFFF;
+	background-color: #545454;
+	border:none;
+	width: 100%;
+	font-size:16px;
+	font-family:Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+}
