@@ -27,7 +27,6 @@ if(isset($_POST['logoff'])) //Remove cookies
 <head>
 <meta charset="utf-8">
 <title>SMS</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script> 
 <script src="sms.js" type="text/javascript"></script>
 <link href="sms.css" rel="stylesheet" type="text/css">
 </head>
@@ -63,13 +62,9 @@ if(!empty($_COOKIE['sms_provider']) && !empty($_COOKIE['sms_user']) && !empty($_
 		$sms=new pswinsms_extend($_COOKIE['sms_user'],$_COOKIE['sms_password'],$_COOKIE['sms_sender']);
 	else
 		trigger_error("Invalid provider: {$_COOKIE['sms_provider']}",E_USER_ERROR);
-	//var_dump($sms);
-//die();
 }
-//print_r($_POST);
 if(!empty($_POST['to']) && !empty($_POST['message']))
 {
-	//echo "<div id=\"status\">\n";
 	if(!isset($sms))
 		trigger_error("SMS class not loaded",E_USER_ERROR);
 	if(strpos($_POST['to'],',')!==false)
@@ -87,18 +82,16 @@ if(!empty($_POST['to']) && !empty($_POST['message']))
 		$string=$status;
 	else
 	{
-	$string="Meldingen ble sendt til følgende mottakere:\\n";
-	foreach($status as $recepient=>$recipient_status)
-	{
-		$string.=$recepient.': ';
-		if($recipient_status===true)
-			$string.='OK';
-		else
-			$string.='Feil: '.$recipient_status;
-		$string.="\\n";
-	}
-	//echo "<a href=\"#\" class='close'>[X]</a>";
-	//echo "</div>\n";
+		$string="Meldingen ble sendt til følgende mottakere:\\n";
+		foreach($status as $recepient=>$recipient_status)
+		{
+			$string.=$recepient.': ';
+			if($recipient_status===true)
+				$string.='OK';
+			else
+				$string.='Feil: '.$recipient_status;
+			$string.="\\n";
+		}
 	}
     echo "<script type=\"text/javascript\">alert('$string')</script>\n";
 }
