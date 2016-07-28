@@ -1,21 +1,14 @@
 <?php
-//print_r($_POST);
 if(!empty($_POST['sms_user']) && !empty($_POST['sms_password']))
 {
-	/*setcookie('sms_user',$_POST['username'],365);
-	setcookie('sms_password',$_POST['password'],365);
-	setcookie('sms_provider','telenor',365);
-	$_COOKIE['sms_user']=$_POST['username'];
-	$_COOKIE['sms_password']=$_POST['password'];
-	$_COOKIE['sms_provider']=$_POST['provider'];
-	$_COOKIE['sms_sender']=$_POST['sender'];*/
-	foreach($_POST as $key=>$value)
+	if(!isset($_POST['sms_provider']))
+		$_POST['sms_provider']='account';
+	foreach($_POST as $key=>$value) //Save login as a cookie for 365 days
 	{
 		if(substr($key,0,3)=='sms')
 		{
 			setcookie($key,$value,strtotime('+365 days'));
 			$_COOKIE[$key]=$value;
-			//echo "$key=$value\n";
 		}
 	}
 }
@@ -43,13 +36,28 @@ if(isset($_POST['logoff'])) //Remove cookies
 <div id="content">
 <?Php
 require 'PSWinCom-sms-class-extend.php';
-//require 'config.php';
+if(file_exists('config.php'))
+	require 'config.php';
 require 'telenor_sms.php';
-//var_dump($_COOKIE);
 
-if(!empty($_COOKIE['sms_provider']) && !empty($_COOKIE['sms_user']) && !empty($_COOKIE['sms_password']))
+if(!empty($_COOKIE['sms_provider']) && !empty($_COOKIE['sms_user']) && !empty($_COOKIE['sms_password'])) //Load login from cookies
 {
-	if($_COOKIE['sms_provider']=='telenor')
+	if($_COOKIE['sms_provider']=='account')
+	{
+		$user=strtolower($_COOKIE['sms_user']);
+		if(isset($config['accounts'][$user]))
+		{
+			if($_POST['sms_password']!=$config['accounts'][$user]['password'])
+				echo "Feil passord";
+			elseif($config['accounts'][$user]['provider']=='linkmobility')
+				$sms=new pswinsms_extend($config['providers']['linkmobility']['username'],$config['providers']['linkmobility']['password'],$config['accounts'][$user]['sender']);
+			else
+				echo "Feil i config, ukjent leverandør";
+		}
+		else
+			echo "Ukjent bruker: ".$user;
+	}
+	elseif($_COOKIE['sms_provider']=='telenor')
 		$sms=new telenor_sms($_COOKIE['sms_user'],$_COOKIE['sms_password']);
 	elseif($_COOKIE['sms_provider']=='pswincom')
 		$sms=new pswinsms_extend($_COOKIE['sms_user'],$_COOKIE['sms_password'],$_COOKIE['sms_sender']);
@@ -65,17 +73,16 @@ if(!empty($_POST['to']) && !empty($_POST['message']))
 	if(!isset($sms))
 		trigger_error("SMS class not loaded",E_USER_ERROR);
 	if(strpos($_POST['to'],',')!==false)
-	{
 		$recipients=explode(",",$_POST['to']);
-		foreach($recipients as $key=>$recipient)
-		{
-			if(strlen($recipient)==8)
-				$recipients[$key]='47'.$recipient; //Add country code¨
-		}
-		$status=$sms->sendmessage($recipients,$_POST['message']);
-	}
 	else
-		$status=$sms->sendmessage($_POST['to'],$_POST['message']);
+		$recipients=array($_POST['to']);
+	foreach($recipients as $key=>$recipient)
+	{
+		if(strlen($recipient)==8)
+			$recipients[$key]='47'.$recipient; //Add country code
+	}
+	$status=$sms->sendmessage($recipients,$_POST['message']);
+
 	if(is_string($status))
 		$string=$status;
 	else
@@ -122,17 +129,31 @@ else
 	</p>
     <p>
     <input name="sms_password" type="password" id="sms_password" placeholder="Passord" ></p>
+<?Php
+if(!isset($config['accountonly']))
+{
+?>
     <p><select name="sms_provider" id="sms_provider" onChange="providerfield()">
+
   <option value="">Velg leverandør</option>
   <option value="telenor">Telenor</option>
   <option value="pswincom">PSWinCom</option>
-</select></p>
+  <?Php if(isset($config['accounts']))
+  echo '<option value="account">Lokal konto</option>';?>
+</select></p><?Php
+}
+else
+{
+	?><input type="hidden" name="sms_provider" value="account" /><?php
+}
+?>
 	<p id="provider_fields"></p>
 	<input type="submit" value="Logg på">
   </form>
 
 </div>
 <?php
+
 }
 ?>
 
