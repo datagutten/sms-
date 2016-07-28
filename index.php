@@ -106,9 +106,10 @@ if(isset($sms))
 	<p>
 		<input name="to" type="text" id="to" placeholder="Til">
 	</p>
-<p><textarea name="message" id="message" placeholder="Skriv inn din melding" oninput="count_chars()"></textarea></p>
+	<p><textarea name="message" id="message" placeholder="Skriv inn din melding" oninput="count_chars()"></textarea></p>
 	<input type="submit" value="Send" name="send" class="halfwidth" id="button_send"><input type="submit" value="Logg av" name="logoff" class="halfwidth" id="button_logoff">
-<p><span id="charcount"></span></p></form>
+	<p><span id="charcount" style="display:none"></span></p>
+</form>
 </div>
 <?php
 }
